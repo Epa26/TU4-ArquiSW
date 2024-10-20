@@ -16,6 +16,35 @@ class Calificacion(BaseModel):
 def paginar(items, skip: int = 0, limit: int = 10):
     return items[skip: skip + limit]
 
+# Servicio para registrar una nueva calificación
+@app.post("/calificaciones/estudiante/", response_model=Calificacion)
+async def registrar_calificacion(calificacion: Calificacion):
+    # Verificar si ya existe una calificación para ese estudiante en el curso
+    for cal in data.calificaciones_simuladas:
+        if cal["id_estudiante"] == calificacion.id_estudiante and cal["id_curso"] == calificacion.id_curso:
+            raise HTTPException(status_code=400, detail="El estudiante ya tiene una calificación en este curso")
+
+    # Agregar la nueva calificación
+    nueva_calificacion = {
+        "id_estudiante": calificacion.id_estudiante,
+        "id_curso": calificacion.id_curso,
+        "calificacion": calificacion.calificacion
+    }
+    data.calificaciones_simuladas.append(nueva_calificacion)
+
+    return nueva_calificacion
+
+# Servicio para actualizar una calificación existente
+@app.put("/calificaciones/estudiante/", response_model=Calificacion)
+async def actualizar_calificacion(calificacion: Calificacion):
+    for cal in data.calificaciones_simuladas:
+        if cal["id_estudiante"] == calificacion.id_estudiante and cal["id_curso"] == calificacion.id_curso:
+            cal["calificacion"] = calificacion.calificacion
+            return cal
+
+    raise HTTPException(status_code=404, detail="Calificación no encontrada")
+
+
 # Servicio para listar las calificaciones de un estudiante
 @app.get("/calificaciones/estudiante/{id_estudiante}", response_model=List[Calificacion])
 async def listar_calificaciones_estudiante(
