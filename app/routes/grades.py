@@ -1,8 +1,9 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Body
 from app.models import GradeCreate
 from app.services.mongodb import MongoDBService
 from app.services.rabbitmq import Emit
 from bson import ObjectId
+from typing import Annotated
 import logging
 
 router = APIRouter()
@@ -11,9 +12,29 @@ emit_events = Emit()
 
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s:%(levelname)s:%(name)s:%(message)s')
+@router.post("/{course_id}/grades", summary='Registrar calificación')
+async def register_grade(course_id: int, grade: Annotated[
+                                                    GradeCreate,
+                                                    Body(
+                                                        examples=[
+                                                            {
+                                                                "student_id": 12,
+                                                                "score": 96.5,
+                                                                "parallel_id": 2
+                                                            }
+                                                        ],
+                                                    )
+                                                ]):
+    """
+    Registra una nueva calificación para un curso específico:
 
-@router.post("/{course_id}/grades")
-async def register_grade(course_id: int, grade: GradeCreate):
+    - `course_id`: ID del curso
+    - `student_id`: ID del estudiante
+    - `score`: Nota del estudiante en el curso
+    - `parallel_id`: ID del paralelo
+
+    Además, se crea un evento a RabbitMQ indicando la creación de la calificación
+    """
     grade_id = mongo_service.get_next_sequence_value("grade_id")
     grade_data = grade.dict()
     grade_data["grade_id"] = grade_id
@@ -30,8 +51,19 @@ async def register_grade(course_id: int, grade: GradeCreate):
     emit_events.send(f"grade.{grade_id}.created", grade_data)
     return result
 
-@router.get("/{course_id}/parallels/{parallel_id}/grades")
+@router.get("/{course_id}/parallels/{parallel_id}/grades", summary='Listar calificaciones por paralelo')
 async def list_grades(course_id: int, parallel_id: int, page: int = 1, limit: int = 10):
+    """
+    Lista todas las calificaciones asociadas a un curso y paralelo específico, con paginación:
+
+    - `course_id`: ID del curso
+    - `parallel_id`: ID del paralelo
+
+    Parametros
+
+    - `page`: Número de página (por defecto, 1)
+    - `limit`: Cantidad de resultados por página (por defecto, 10)
+    """
     grades = mongo_service.get_grades_by_parallel(course_id, parallel_id, page, limit)
     logging.info(f"Calificaciones listadas por course_id: {course_id} y parallel_id: {parallel_id}")
     for grade in grades:
@@ -42,8 +74,13 @@ async def list_grades(course_id: int, parallel_id: int, page: int = 1, limit: in
     return grades
 
 # NUEVA RUTA: Consultar una calificación por ID
-@router.get("/grades/{grade_id}")
+@router.get("/grades/{grade_id}", summary='Consultar calificación')
 async def get_grade(grade_id: int):
+    """
+    Consulta los detalles de una calificación específica por su `grade_id`:
+
+    - `grade_id`: ID de la calificación
+    """
     grade = mongo_service.get_grade_by_id(grade_id)
     logging.info(f"Calificacion listada por grade_id: {grade_id}")
     if not grade:
@@ -53,11 +90,60 @@ async def get_grade(grade_id: int):
     return grade
 
 # NUEVA RUTA: Eliminar una calificación por ID
-@router.delete("/grades/{grade_id}")
+@router.delete("/grades/{grade_id}", summary='Eliminar una calificación')
 async def delete_grade(grade_id: int):
+    """
+    Elimina una calificación específica por su `grade_id`:
+
+    - `grade_id`: ID de la calificación
+
+    Además, se crea un evento a RabbitMQ indicando la eliminación de la calificación
+    """
     result = mongo_service.delete_grade_by_id(grade_id)
     logging.info(f"Calificacion eliminada por grade_id: {grade_id}")
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Grade not found")
     emit_events.send(f"grade.{grade_id}.deleted", {"grade_id": grade_id})
     return {"message": "Grade deleted successfully"}
+
+
+# Servicio para listar las calificaciones de un estudiante
+@router.get("/{student_id}/grades", summary='Listar calificaciones del estudiante')
+async def listar_calificaciones_estudiante(student_id: int):
+    """
+    Lista todas las calificaciones asociadas al estudiante:
+
+    - `student_id`: ID del estudiante
+    """
+    pass
+
+# Servicio para listar las calificaciones de un curso
+@router.get("/{course_id}/grades", summary='Listar calificaciones de un curso')
+async def listar_calificaciones_curso(course_id: int):
+    """
+    Lista todas las calificaciones asociadas a un curso:
+
+    - `course_id`: ID del curso
+    """
+    pass
+
+# Servicio para actualizar una calificación existente
+@router.put("/{course_id}/grades/{grade_id}", summary='Actualizar calificación')
+async def actualizar_calificacion(course_id: int, grade_id: int, score: float):
+    """
+    Actualiza la calificación de un curso:
+
+    - `course_id`: ID del estudiante
+    - `grade_id`: ID del curso
+    - `score`: Nueva calificación
+
+    Además, se crea un evento a RabbitMQ indicando la actualización de la calificación
+    """
+    query_filter = {"course_id" : course_id,
+                    "grade_id" : grade_id}
+    update_operation = { '$set' : 
+        { "score" : score }
+    }
+    result = mongo_service.update_grade(query_filter, update_operation)
+    emit_events.send(f"grade.{grade_id}.updated", {"grade_id": grade_id, "course_id": course_id})
+    return result

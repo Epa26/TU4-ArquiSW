@@ -9,6 +9,9 @@ class MongoDBService:
         self.db.grades.insert_one(grade_data)
         return grade_data
 
+    def update_grade(self,query_filter, update_operation):
+        return self.db.grades.update_one(query_filter, update_operation).raw_result
+    
     def get_grades_by_parallel(self, course_id, parallel_id, page, limit):
         skips = limit * (page - 1)
         cursor = self.db.grades.find({"course_id": course_id, "parallel_id": parallel_id})
