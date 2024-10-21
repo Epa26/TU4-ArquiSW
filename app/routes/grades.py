@@ -34,3 +34,22 @@ async def list_grades(course_id: int, parallel_id: int, page: int = 1, limit: in
     if not grades:
         raise HTTPException(status_code=404, detail="No grades found")
     return grades
+
+# NUEVA RUTA: Consultar una calificación por ID
+@router.get("/grades/{grade_id}")
+async def get_grade(grade_id: int):
+    grade = mongo_service.get_grade_by_id(grade_id)
+    if not grade:
+        raise HTTPException(status_code=404, detail="Grade not found")
+    if isinstance(grade['_id'], ObjectId):
+        grade['_id'] = str(grade['_id'])
+    return grade
+
+# NUEVA RUTA: Eliminar una calificación por ID
+@router.delete("/grades/{grade_id}")
+async def delete_grade(grade_id: int):
+    result = mongo_service.delete_grade_by_id(grade_id)
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Grade not found")
+    rabbitmq_service_emit.send(f"grade.{grade_id}.deleted", {"grade_id": grade_id})
+    return {"message": "Grade deleted successfully"}

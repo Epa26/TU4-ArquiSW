@@ -14,7 +14,7 @@ class MongoDBService:
         cursor = self.db.grades.find({"course_id": course_id, "parallel_id": parallel_id})
         grades = list(cursor.skip(skips).limit(limit))
         return grades
-    
+
     def get_next_sequence_value(self, sequence_name: str) -> int:
         result = self.db.counters.find_one_and_update(
             {"_id": sequence_name},
@@ -25,3 +25,11 @@ class MongoDBService:
             self.db.counters.insert_one({"_id": sequence_name, "sequence_value": 1})
             return 1
         return result["sequence_value"]
+
+    # NUEVO MÉTODO: Consultar una calificación por ID
+    def get_grade_by_id(self, grade_id: int):
+        return self.db.grades.find_one({"grade_id": grade_id})
+
+    # NUEVO MÉTODO: Eliminar una calificación por ID
+    def delete_grade_by_id(self, grade_id: int):
+        return self.db.grades.delete_one({"grade_id": grade_id})
