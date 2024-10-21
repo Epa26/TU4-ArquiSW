@@ -258,7 +258,7 @@ git clone -b test https://github.com/Epa26/TU4-ArquiSW.git
 docker-compose up --build
 ```
 
-**IMPORTANTE:** se debe ejecutar primero el archivo docker-compose de message-broker(RabbitMQ) primero hasta que se inicialice correctamente, luego ejecutar el archivo docker-compose de la carpeta raiz.
+**IMPORTANTE:** se debe ejecutar primero el archivo docker-compose de message-broker(RabbitMQ) hasta que se inicialice correctamente, luego ejecutar el archivo docker-compose de la carpeta raiz.
 
 ### 7.3. Acceder a la API:
 Una vez que la aplicación esté corriendo, la API estará disponible en `http://localhost:8000/api/v1`.
