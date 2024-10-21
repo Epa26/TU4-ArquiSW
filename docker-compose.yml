@@ -3,19 +3,34 @@ services:
     build: .
     ports:
       - "8000:8000"
-    depends_on:
+    volumes:
+      - .:/app
+    links:
       - mongo
-      - rabbitmq
     environment:
       - DATABASE_URL=mongodb://mongo:27017/grade_management
 
+  app_receiver:
+    build: .
+    volumes:
+      - .:/app
+    links:
+      - mongo
+    command: python3 app/services/rabbitmq.py
+
   mongo:
     image: mongo:latest
+    volumes:
+      - grades_mongo_container:/data/db
     ports:
       - "27017:27017"
+    logging:
+        driver: none
 
-  rabbitmq:
-    image: rabbitmq:3-management
-    ports:
-      - "5672:5672"
-      - "15672:15672"
+volumes:
+  grades_mongo_container:
+
+networks:
+  default:
+    name: grades
+    external: True
