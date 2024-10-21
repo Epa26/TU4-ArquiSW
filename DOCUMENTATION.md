@@ -33,6 +33,7 @@ models.py: Define los modelos de datos para las calificaciones.
 Endpoint: POST /api/v1/{course_id}/grades
 Descripción: Registra una nueva calificación para un curso específico.
 Ejemplo de Petición:
+
 {
   "student_id": 12345,
   "value": 90,
@@ -50,6 +51,7 @@ limit: Cantidad de resultados por página (por defecto, 10).
 Endpoint: GET /api/v1/grades/{grade_id}
 Descripción: Consulta los detalles de una calificación específica por su grade_id.
 Ejemplo de Respuesta:
+
 {
   "grade_id": 1,
   "student_id": 12345,
@@ -80,6 +82,7 @@ Cuando se elimina una calificación: grade.{grade_id}.deleted.
 6. Descripción de Archivos Clave
 6.1. Dockerfile
 Define la imagen de Docker que se utiliza para ejecutar la aplicación. Incluye la instalación de las dependencias necesarias.
+
 FROM python:3.11
 
 WORKDIR /app
@@ -115,6 +118,7 @@ services:
 
 6.3. Events (events.py)
 Se encarga de manejar los eventos de RabbitMQ tanto para la emisión como para la recepción de mensajes. Utiliza un exchange tipo topic para publicar eventos relacionados con las calificaciones.
+
 import json
 import pika
 import logging
@@ -182,12 +186,15 @@ pika
 
 7. Cómo Ejecutar el Proyecto
 7.1. Clonar el repositorio:
+   
 git clone -b test https://github.com/Epa26/TU4-ArquiSW.git
 
 7.2. Levantar los contenedores con Docker:
+
 docker-compose up --build
 
 7.3. Acceder a la API:
+
 Una vez que la aplicación esté corriendo, la API estará disponible en http://localhost:8000/api/v1.
 
 Para verificar que el servicio esté funcionando correctamente, puedes acceder a la ruta principal GET /, que debería devolver un mensaje de estado.
