@@ -94,6 +94,7 @@ CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
 
 6.2. docker-compose.yml
 Orquesta los servicios necesarios para levantar la aplicación, como MongoDB y RabbitMQ.
+
 services:
   web:
     build: .
