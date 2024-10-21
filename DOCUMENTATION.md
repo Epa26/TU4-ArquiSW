@@ -17,12 +17,13 @@ El proyecto sigue la siguiente estructura de directorios:
 │   ├── main.py
 │   └── models.py
 ├── assets/
+├── message-broker/
+│   ├── docker-compose.yml
 ├── Dockerfile
 ├── README.md
 ├── _app.py
 ├── data.py
 ├── docker-compose.yml
-├── events.py
 └── requirements.txt
 ```
 
@@ -40,7 +41,7 @@ El proyecto sigue la siguiente estructura de directorios:
 ```json
 {
   "student_id": 12345,
-  "value": 90,
+  "score": 90,
   "parallel_id": 1
 }
 ```
@@ -61,7 +62,7 @@ El proyecto sigue la siguiente estructura de directorios:
   "grade_id": 1,
   "student_id": 12345,
   "course_id": 101,
-  "value": 95,
+  "score": 95,
   "parallel_id": 1
 }
 ```
@@ -99,68 +100,110 @@ COPY . .
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
 ```
 
 ### 6.2. docker-compose.yml
 Orquesta los servicios necesarios para levantar la aplicación, como MongoDB y RabbitMQ.
-```yaml
-services:
-  web:
-    build: .
-    ports:
-      - "8000:8000"
-    depends_on:
-      - mongo
-      - rabbitmq
-    environment:
-      - DATABASE_URL=mongodb://mongo:27017/grade_management
 
-  mongo:
-    image: mongo:latest
-    ports:
-      - "27017:27017"
+**IMPORTANTE:** verificar si se tiene creada la red de docker `grades`, en caso contrario ejecutar el siguiente comando:
 
-  rabbitmq:
-    image: rabbitmq:3-management
-    ports:
-      - "5672:5672"
-      - "15672:15672"
+```bash
+docker network create grades
 ```
 
-### 6.3. Events (events.py)
+* API, Receptor de mensajes de RabbitMQ y Mongo:
+  ```yaml
+  services:
+    web:
+      build: .
+      ports:
+        - "8000:8000"
+      volumes:
+        - .:/app
+      links:
+        - mongo
+      environment:
+        - DATABASE_URL=mongodb://mongo:27017/grade_management
+
+    app_receiver:
+      build: .
+      volumes:
+        - .:/app
+      links:
+        - mongo
+      command: python3 app/services/rabbitmq.py
+
+    mongo:
+      image: mongo:latest
+      volumes:
+        - grades_mongo_container:/data/db
+      ports:
+        - "27017:27017"
+      logging:
+          driver: none
+
+  volumes:
+    grades_mongo_container:
+
+  networks:
+    default:
+      name: grades
+      external: True
+  ```
+
+* Message-broker (RabbitMQ)
+  ```yaml
+  services:
+    rabbitmq:
+        image: rabbitmq:3-management-alpine
+        ports:
+          - "5672:5672"
+          - "15672:15672"
+
+  networks:
+    default:
+      name: grades
+      external: True
+  ```
+
+### 6.3. Events (rabbitmq.py)
 Se encarga de manejar los eventos de RabbitMQ tanto para la emisión como para la recepción de mensajes. Utiliza un exchange tipo topic para publicar eventos relacionados con las calificaciones.
 ```python
-import json
 import pika
+import json
+import time
 import logging
 
 logging.getLogger("pika").setLevel(logging.ERROR)
 
-host_name = 'localhost'
-
 class Emit:
-    def send(self, id, action, payload):
+
+    def send(self, routing_key, payload):
         self.connect()
-        self.publish(id, action, payload)
+        self.publish(routing_key, payload)
         self.close()
 
     def connect(self):
-        self.connection = pika.BlockingConnection(
-            pika.ConnectionParameters(host=host_name)
+        while True:
+            try:
+                self.connection = pika.BlockingConnection(pika.ConnectionParameters(host='rabbitmq'))
+                print("Conectado a RabbitMQ")
+                self.channel = self.connection.channel()
+                self.channel.exchange_declare(exchange='grade_exchange',
+                                              exchange_type='topic')
+                return
+            except pika.exceptions.AMQPConnectionError:
+                print("Esperando a que RabbitMQ esté disponible...")
+                time.sleep(5)
+
+    def publish(self, routing_key, message):
+        self.channel.basic_publish(
+            exchange='grade_exchange',
+            routing_key=routing_key,
+            body=json.dumps(message)
         )
-        self.channel = self.connection.channel()
-        self.channel.exchange_declare(exchange='grades',
-                                      exchange_type='topic')
-
-    def publish(self, id, action, payload):
-        routing_key = f"grade.{id}.{action}"
-        message = json.dumps(payload)
-
-        self.channel.basic_publish(exchange='grades',
-                                   routing_key=routing_key,
-                                   body=message)
-
+    
     def close(self):
         self.connection.close()
 
@@ -168,26 +211,31 @@ class Receive:
     def __init__(self):
         logging.info("Waiting for messages...")
         self.connection = pika.BlockingConnection(
-            pika.ConnectionParameters(host=host_name)
+            pika.ConnectionParameters(host='rabbitmq')
         )
 
         self.channel = self.connection.channel()
-        self.channel.exchange_declare(exchange='grades',
+        self.channel.exchange_declare(exchange='grade_exchange',
                                       exchange_type='topic')
 
         self.channel.queue_declare('grade_event_queue', exclusive=True)
-        self.channel.queue_bind(exchange='grades', queue='grade_event_queue', routing_key="grade.*.*")
+        self.channel.queue_bind(exchange='grade_exchange', queue='grade_event_queue', routing_key="grade.*.*")
         self.channel.basic_consume(queue='grade_event_queue', on_message_callback=self.callback)
 
         self.channel.start_consuming()
 
     def callback(self, ch, method, properties, body):
         body = json.loads(body)
-        logging.info(f"Calificación del usuario modificada")
+        logging.info(f"Mensaje '{method.routing_key}'")
         ch.basic_ack(delivery_tag=method.delivery_tag)
 
     def close(self):
         self.connection.close()
+
+if __name__ == '__main__':
+    logging.basicConfig(level=logging.INFO,
+                        format='%(asctime)s:%(levelname)s:%(name)s:%(message)s')
+    Receive()
 ```
 
 ### 6.4. Requisitos (requirements.txt)
@@ -209,6 +257,8 @@ git clone -b test https://github.com/Epa26/TU4-ArquiSW.git
 ```bash
 docker-compose up --build
 ```
+
+**IMPORTANTE:** se debe ejecutar primero el archivo docker-compose de message-broker(RabbitMQ) primero hasta que se inicialice correctamente, luego ejecutar el archivo docker-compose de la carpeta raiz.
 
 ### 7.3. Acceder a la API:
 Una vez que la aplicación esté corriendo, la API estará disponible en `http://localhost:8000/api/v1`.
