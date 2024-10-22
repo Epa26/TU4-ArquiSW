@@ -1,0 +1,36 @@
+services:
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    links:
+      - mongo
+    environment:
+      - DATABASE_URL=mongodb://mongo:27017/grade_management
+
+  app_receiver:
+    build: .
+    volumes:
+      - .:/app
+    links:
+      - mongo
+    command: python3 app/services/rabbitmq.py
+
+  mongo:
+    image: mongo:latest
+    volumes:
+      - grades_mongo_container:/data/db
+    ports:
+      - "27017:27017"
+    logging:
+        driver: none
+
+volumes:
+  grades_mongo_container:
+
+networks:
+  default:
+    name: grades
+    external: True
