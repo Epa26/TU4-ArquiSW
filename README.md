@@ -1,21 +1,3 @@
----
-marp: true
----
-<!-- marp: true -->
-<!-- theme: uncover -->
-<!-- class: invert -->
-<!-- paginate: true -->
-<!-- footer: Microservicios por Rafik Mas'ad Nasra -->
-<!-- author: Rafik Mas'ad Nasra -->
-<!-- title: Comunicación entre servicios -->
-<!-- size: 16:9 -->
-
-<style>    
-    ul { margin: 0; }
-    section.invert p { text-align: left; }
-    section.invert h4 { text-align: left; }
-</style>
-
 ## Sistemas de Gestión Académica Universitario - Módulo Calificaciones
 
 ---
@@ -118,9 +100,6 @@ Mensajes (eventos/event-driven):
 
 ![Diagrama de arquitectura general](./assets/general.svg)
 
----
-
-![Diagrama de arquitectura general](./assets/general2.png)
 ---
 
 ## Cómo Ejecutar el Proyecto
