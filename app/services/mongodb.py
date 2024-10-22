@@ -10,7 +10,7 @@ class MongoDBService:
         return grade_data
 
     def update_grade(self,query_filter, update_operation):
-        return self.db.grades.update_one(query_filter, update_operation).raw_result
+        return self.db.grades.update_one(query_filter, update_operation)
     
     def get_grades_by_parallel(self, course_id, parallel_id, page, limit):
         skips = limit * (page - 1)
@@ -18,6 +18,18 @@ class MongoDBService:
         grades = list(cursor.skip(skips).limit(limit))
         return grades
 
+    def get_grades_by_student(self, student_id, page, limit):
+        skips = limit * (page - 1)
+        cursor = self.db.grades.find({"student_id": student_id})
+        grades = list(cursor.skip(skips).limit(limit))
+        return grades
+    
+    def get_grades_by_course(self, course_id, page, limit):
+        skips = limit * (page - 1)
+        cursor = self.db.grades.find({"course_id": course_id})
+        grades = list(cursor.skip(skips).limit(limit))
+        return grades
+    
     def get_next_sequence_value(self, sequence_name: str) -> int:
         result = self.db.counters.find_one_and_update(
             {"_id": sequence_name},
