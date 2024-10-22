@@ -111,7 +111,7 @@ async def delete_grade(grade_id: int):
 
 
 # Servicio para listar las calificaciones de un estudiante
-@router.get("/{student_id}/grades", summary='Listar calificaciones del estudiante')
+@router.get("/students/{student_id}/grades", summary='Listar calificaciones del estudiante')
 async def listar_calificaciones_estudiante(student_id: int,
     page: int = 1,
     limit: int = 10,
