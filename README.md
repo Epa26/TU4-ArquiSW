@@ -105,7 +105,7 @@ Mensajes (eventos/event-driven):
 ## Cómo Ejecutar el Proyecto
 ### Clonar el repositorio:
 ```bash
-git clone -b test https://github.com/Epa26/TU4-ArquiSW.git
+git clone https://github.com/Epa26/TU4-ArquiSW.git
 ```
 
 ### Levantar los contenedores con Docker:

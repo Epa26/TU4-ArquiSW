@@ -1,4 +1,4 @@
-# Documentación del Proyecto (Rama test)
+# Documentación del Proyecto
 
 ## 1. Descripción General del Proyecto
 Este proyecto implementa un sistema de gestión de calificaciones utilizando microservicios. El sistema incluye un servicio de almacenamiento y gestión de calificaciones en MongoDB, y un sistema de mensajería asíncrona con RabbitMQ para la transmisión de eventos relevantes al sistema.
@@ -250,7 +250,7 @@ pika
 ## 7. Cómo Ejecutar el Proyecto
 ### 7.1. Clonar el repositorio:
 ```bash
-git clone -b test https://github.com/Epa26/TU4-ArquiSW.git
+git clone https://github.com/Epa26/TU4-ArquiSW.git
 ```
 
 ### 7.2. Levantar los contenedores con Docker:
