@@ -125,3 +125,7 @@ Para verificar que el servicio esté funcionando correctamente, puedes acceder a
 Se puede acceder a la documentación generada automáticamente por fastapi en `http://localhost:8000/docs`.
 
 Además en el repositorio se encuentra una documentación más extensa en [DOCUMENTATION.md](DOCUMENTATION.md).
+
+## Video
+
+[Video](https://youtu.be/opn19XAtM70) mostrando cada una de las funcionalidades mediante Postman. 
