@@ -1,21 +1,3 @@
----
-marp: true
----
-<!-- marp: true -->
-<!-- theme: uncover -->
-<!-- class: invert -->
-<!-- paginate: true -->
-<!-- footer: Microservicios por Rafik Mas'ad Nasra -->
-<!-- author: Rafik Mas'ad Nasra -->
-<!-- title: Comunicación entre servicios -->
-<!-- size: 16:9 -->
-
-<style>    
-    ul { margin: 0; }
-    section.invert p { text-align: left; }
-    section.invert h4 { text-align: left; }
-</style>
-
 ## Sistemas de Gestión Académica Universitario - Módulo Calificaciones
 
 ---
@@ -120,6 +102,26 @@ Mensajes (eventos/event-driven):
 
 ---
 
-![Diagrama de arquitectura general](./assets/general2.png)
----
+## Cómo Ejecutar el Proyecto
+### Clonar el repositorio:
+```bash
+git clone https://github.com/Epa26/TU4-ArquiSW.git
+```
 
+### Levantar los contenedores con Docker:
+```bash
+docker-compose up --build
+```
+
+**IMPORTANTE:** se debe ejecutar primero `docker-compose up` de message-broker(RabbitMQ) hasta que se inicialice correctamente y luego ejecutar `docker-compose up` en la carpeta raiz.
+
+### Acceder a la API:
+Una vez que la aplicación esté corriendo, la API estará disponible en `http://localhost:8000/api/v1`.
+
+Para verificar que el servicio esté funcionando correctamente, puedes acceder a la ruta principal `GET /`, que debería devolver un mensaje de estado.
+
+## Documentación
+
+Se puede acceder a la documentación generada automáticamente por fastapi en `http://localhost:8000/docs`.
+
+Además en el repositorio se encuentra una documentación más extensa en [DOCUMENTATION.md](DOCUMENTATION.md).
