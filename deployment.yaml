@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grade-management
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: grade-management
+  template:
+    metadata:
+      labels:
+        app: grade-management
+    spec:
+      containers:
+      - name: grade-management
+        image: rxrrx/grade-management:latest  
+        ports:
+        - containerPort: 8000
+        env:
+        - name: DATABASE_URL
+          value: mongodb://mongo:27017/grade_management 
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: grade-management
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 8000
+  selector:
+    app: grade-management
