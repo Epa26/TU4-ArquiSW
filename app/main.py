@@ -14,8 +14,8 @@ logging.basicConfig(level=logging.INFO,
 def Module(props):
     return html.li(
         {"key": props['id'], "style": modules_style},
-        f"{props['text']}",
-        html.button({"style": button_style, "onclick": lambda: handle_click(props['id'])}, f"{props['action']}")
+        f"{props['text']} ",
+        html.button({"style": button_style, "onclick": lambda event: handle_click(props['id'])}, f"{props['action']}")
     )
 
 
