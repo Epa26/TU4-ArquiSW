@@ -14,7 +14,7 @@ logging.basicConfig(level=logging.INFO,
 def Module(props):
     return html.li(
         {"key": props['id'], "style": modules_style},
-        f"{props['text']} - {props['color']}",
+        f"{props['text']}",
         html.button({"style": button_style, "onclick": lambda: handle_click(props['id'])}, f"{props['action']}")
     )
 
@@ -40,14 +40,14 @@ def handle_click(module_id):
 @component
 def ModulesList():
     modules = [
-        {"id": 0, "text": "Registrar calificación", "color": "yellow", "action": "Registar"},
-        {"id": 1, "text": "Ver calificaciones por parallel_id", "color": 0, "action": "Visualizar"},
-        {"id": 2, "text": "Ver calificaciones por course_id", "color": 0, "action": "Visualizar"},
-        {"id": 3, "text": "Consultar calificación por grade_id", "color": 0, "action": "Consultar"},
-        {"id": 4, "text": "Eliminar calificación por grade_id", "color": 2, "action": "Eliminar"},
-        {"id": 5, "text": "Ver calificaciones de un estudiante por student_id", "color": 2, "action": "Visualizar"},
-        {"id": 6, "text": "Ver calificaciones por course_id", "color": 1, "action": "Visualizar"},
-        {"id": 7, "text": "Actualizar calificación por course_id", "color": 1, "action": "Actualizar"},
+        {"id": 0, "text": "Registrar calificación", "action": "Registar"},
+        {"id": 1, "text": "Ver calificaciones por parallel_id", "action": "Visualizar"},
+        {"id": 2, "text": "Ver calificaciones por course_id", "action": "Visualizar"},
+        {"id": 3, "text": "Consultar calificación por grade_id", "action": "Consultar"},
+        {"id": 4, "text": "Eliminar calificación por grade_id", "action": "Eliminar"},
+        {"id": 5, "text": "Ver calificaciones de un estudiante por student_id", "action": "Visualizar"},
+        {"id": 6, "text": "Ver calificaciones por course_id", "action": "Visualizar"},
+        {"id": 7, "text": "Actualizar calificación por course_id", "action": "Actualizar"},
     ]
     return html.ul([Module(module) for module in modules])
 
