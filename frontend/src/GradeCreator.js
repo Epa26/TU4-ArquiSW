@@ -81,7 +81,7 @@ function GradeCreator() {
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'row'}}>
                         <BotonBuscar style={{backgroundColor: '#849324', color: 'black'}} onClick={() => CreateGrade()}>
-                            Modificar
+                            Crear
                         </BotonBuscar>
                     </div>
                 </Tarjeta>
