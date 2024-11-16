@@ -1,4 +1,9 @@
 services:
+  frontend:
+    build: ./frontend
+    container_name: frontend_react
+    ports:
+      - '3000:3000'
   web:
     build: .
     ports:

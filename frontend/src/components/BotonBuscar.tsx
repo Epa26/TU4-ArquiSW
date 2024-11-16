@@ -10,6 +10,7 @@ export const BotonBuscar: React.FC<ButtonProps> = ({ children, style, ...props }
     border: 'none',
     fontSize: '14px',
     width: '100%',
+    cursor: 'pointer',
     color: '#ffffff',
     ...style,
   }

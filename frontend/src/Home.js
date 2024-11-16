@@ -79,7 +79,7 @@ function Home() {
                         </div>
                     </div>
                 );
-                requestURI = url + `${currentCourseID}/grades?page=${currentPage}&limit=${gradesPerPage}&min_score=${gradeRange.min}&max_score=${gradeRange.max}`;
+                requestURI = url + `${currentCourseID}/grades?min_score=${gradeRange.min}&max_score=${gradeRange.max}`;
                 break;
             case "parallel":
                 filterComponent =(
@@ -104,7 +104,7 @@ function Home() {
                         />
                     </div>
                 );
-                requestURI = url + `${currentCourseID}/parallels/${currentParallelID}/grades?page=${currentPage}&limit=${gradesPerPage}`;
+                requestURI = url + `${currentCourseID}/parallels/${currentParallelID}/grades?`;
                 break;
             case "student":
                 filterComponent =(
@@ -143,7 +143,7 @@ function Home() {
                         </div>
                     </div>
                 );
-                requestURI = url + `students/${currentStudentID}/grades?page=${currentPage}&limit=${gradesPerPage}&min_score=${gradeRange.min}&max_score=${gradeRange.max}`;
+                requestURI = url + `students/${currentStudentID}/grades?&min_score=${gradeRange.min}&max_score=${gradeRange.max}`;
                 break;
             default:
                 filterComponent =(
@@ -152,6 +152,7 @@ function Home() {
                     </div>
                 );
         }
+        setGradesPerPage(gradesPerPage)
         return [
             filterComponent,
             <div>
@@ -179,6 +180,12 @@ function Home() {
             </BotonBuscar>
         ]
     }
+
+    function changePage(page){
+        setCurrentPage(page);
+        setURI(uri + `&page=${page}&limit=${gradesPerPage}`);
+    }
+
     return (
     <main>
         <div className="header">
@@ -206,24 +213,33 @@ function Home() {
                     </select>
                 </div>
                 <FilterParameters currentFilter={filterMode}/>
+                <Link to={`grade/create`}>
+                    <BotonBuscar style={{backgroundColor: '#849324'}}>
+                        <Link to={`create`} style={{textDecoration: 'none', color: 'white'}}>
+                            Agregar calificación
+                        </Link>
+                    </BotonBuscar>
+                </Link>
             </div>
             <div className="mainContent">
                 <h1 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '16px' }}>Calificaciones</h1>
                     <div style={{ display: 'grid', gap: '16px', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))' }}>
-                        {grades.map((grade) => (
-                            <Tarjeta key={grade._id}>
-                                <Link to={`grade/${grade.grade_id}`}>
-                                    <button className='cardButton'>
-                                        <p style={{ fontSize: '16px', fontWeight: 'bold' }}>ID de curso: {grade.course_id}</p>
-                                        <div style={{ paddingLeft: '0.5rem', paddingRight: '0.5rem' }}>
-                                            <p style={{ color: '#6b7280', fontSize: '14px', textAlign: 'left' }}>Paralelo: {grade.parallel_id}</p>
-                                            <p style={{ color: '#6b7280', fontSize: '14px', textAlign: 'left' }}>ID de estudiante: {grade.student_id}</p>
-                                            <p style={{ color: '#6b7280', fontSize: '14px', textAlign: 'left' }}>Calificación: {grade.score}</p>
-                                        </div>
-                                    </button>
-                                </Link>
-                            </Tarjeta>
-                        ))}
+                        {grades.length > 0 ?
+                            grades.map((grade) => (
+                                <Tarjeta key={grade._id}>
+                                    <Link to={`grade/${grade.grade_id}`}>
+                                        <button className='cardButton'>
+                                            <p style={{ fontSize: '16px', fontWeight: 'bold' }}>ID de curso: {grade.course_id}</p>
+                                            <div style={{ paddingLeft: '0.5rem', paddingRight: '0.5rem' }}>
+                                                <p style={{ color: '#6b7280', fontSize: '14px', textAlign: 'left' }}>Paralelo: {grade.parallel_id}</p>
+                                                <p style={{ color: '#6b7280', fontSize: '14px', textAlign: 'left' }}>ID de estudiante: {grade.student_id}</p>
+                                                <p style={{ color: '#6b7280', fontSize: '14px', textAlign: 'left' }}>Calificación: {grade.score}</p>
+                                            </div>
+                                        </button>
+                                    </Link>
+                                </Tarjeta>
+                            ))
+                        : <p>No se encontraron calificaciones</p> }
                     </div>
                 <div style={{ marginTop: '24px', display: 'flex', justifyContent: 'space-between', alignGrades: 'center' }}>
                     <p style={{ fontSize: '14px', color: '#6b7280' }}>
@@ -231,14 +247,14 @@ function Home() {
                     </p>
                     <div style={{ display: 'flex', alignGrades: 'center' }}>
                         <Boton
-                            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                            onClick={() => changePage(Math.max(currentPage - 1, 1))}
                             style={{ marginRight: '8px' }}
                         >
                             Anterior
                         </Boton>
                         <span style={{ margin: '0 16px' }}>Página {currentPage}</span>
                         <Boton
-                            onClick={() => setCurrentPage((prev) => prev + 1)}
+                            onClick={() => changePage(currentPage + 1)}
                         >
                             Siguiente
                         </Boton>

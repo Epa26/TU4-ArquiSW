@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import Home from './Home';
+import GradeCreator from './GradeCreator';
 import GradeEditor from './GradeEditor'
 import reportWebVitals from './reportWebVitals';
 import { Link, BrowserRouter as Router, Route, Routes } from "react-router-dom";
@@ -12,7 +13,8 @@ export default function App() {
     <Router>
       <Routes>
         <Route exact path="/" element={<Home/>} />
-        <Route path="grade/:gradeID" element={<GradeEditor/>} />
+          <Route path="grade/:gradeID" element={<GradeEditor/>} />
+          <Route path="create" element={<GradeCreator/>} />
       </Routes>
     </Router>
   )
