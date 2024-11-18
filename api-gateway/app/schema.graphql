@@ -1,0 +1,25 @@
+schema {
+    query: Query
+    mutation: Mutation
+}
+
+type Grade {
+    grade_id: ID!
+    student_id: ID!
+    course_id: ID!
+    parallel_id: ID!
+    score: Float!
+}
+
+type Query {
+    getGradesByParallel(course_id: ID!, parallel_id: ID!): [Grade]!
+    getGradeById(grade_id: ID!): Grade
+    getGradesByStudent(student_id: ID!): [Grade]!
+    getGradesByCourse(course_id: ID!): [Grade]!
+}
+
+type Mutation {
+    registerGrade(course_id: ID!, student_id: ID!, score: Float!, parallel_id: ID!): Grade
+    deleteGrade(grade_id: ID!): Boolean
+    updateGrade(course_id: ID!, grade_id: ID!, score: Float!): Grade
+}

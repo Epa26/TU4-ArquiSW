@@ -1,0 +1,12 @@
+services:
+  api_gateway:
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/app
+
+networks:
+  default:
+    name: grades
+    external: True
