@@ -1,8 +1,12 @@
 ## Sistemas de Gestión Académica Universitario - Módulo Calificaciones
 
+## Video TAREA 4
+
+[Video](https://youtu.be/opn19XAtM70) mostrando cada una de las funcionalidades mediante Postman. 
+
 ## VIDEO TAREA 5
 
-[Video](https://youtu.be/T5IYc8vYJjw) Video demostración del microservicio en Kubernetes y Pruebas de estres.
+[Video](https://youtu.be/T5IYc8vYJjw) demostración del microservicio en Kubernetes y Pruebas de estres.
 
 ---
 
@@ -113,16 +117,24 @@ git clone https://github.com/Epa26/TU4-ArquiSW.git
 ```
 
 ### Levantar los contenedores con Docker:
+**IMPORTANTE:** se debe ejecutar primero `docker-compose up` desde la carpeta `message-broker` para levantar el servicio RabbitMQ hasta que se inicialice correctamente y luego ejecutar desde la carpeta raiz. 
+
 ```bash
 docker-compose up --build
 ```
 
-**IMPORTANTE:** se debe ejecutar primero `docker-compose up` de message-broker(RabbitMQ) hasta que se inicialice correctamente y luego ejecutar `docker-compose up` en la carpeta raiz.
+Finalmente ejecutar `docker-compose up` desde la carpeta `api-gateway` para levantar el servicio de API Gateway hasta que se inicialice correctamente.
 
 ### Acceder a la API:
 Una vez que la aplicación esté corriendo, la API estará disponible en `http://localhost:8000/api/v1`.
 
 Para verificar que el servicio esté funcionando correctamente, puedes acceder a la ruta principal `GET /`, que debería devolver un mensaje de estado.
+
+### Acceder a la Interfaz:
+Una vez que la aplicación esté corriendo, la interfaz estará disponible en `http://localhost:3000`.
+
+### Acceder a la API Gateway:
+Una vez que la aplicación esté corriendo, la API Gateway estará disponible en `http://localhost:5000`.
 
 ## Documentación
 
@@ -130,6 +142,3 @@ Se puede acceder a la documentación generada automáticamente por fastapi en `h
 
 Además en el repositorio se encuentra una documentación más extensa en [DOCUMENTATION.md](DOCUMENTATION.md).
 
-## Video
-
-[Video](https://youtu.be/opn19XAtM70) mostrando cada una de las funcionalidades mediante Postman. 
