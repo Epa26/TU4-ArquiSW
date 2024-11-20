@@ -1,0 +1,5 @@
+fastapi
+uvicorn
+ariadne
+requests
+aiodataloader
