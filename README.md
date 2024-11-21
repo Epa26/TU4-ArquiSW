@@ -8,6 +8,9 @@
 
 [Video](https://youtu.be/T5IYc8vYJjw) demostración del microservicio en Kubernetes y Pruebas de estres.
 
+## Video TAREA 6
+
+[Video](https://youtu.be/qOaWysEZORQ) demostración de la interfaz y API Gateway.
 ---
 
 ### Contexto
