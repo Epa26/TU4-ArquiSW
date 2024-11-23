@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 class Grade(BaseModel):
     grade_id: int
@@ -14,7 +14,7 @@ class Grade(BaseModel):
                     "grade_id": 1,
                     "student_id": 12,
                     "course_id": 365,
-                    "score": 96.5,
+                    "score": 96,
                     "parallel_id": 2
                 }
             ]
@@ -23,7 +23,7 @@ class Grade(BaseModel):
 
 class GradeCreate(BaseModel):
     student_id: int
-    score: float
+    score: float = Field(..., ge=0, le=100)
     parallel_id: int
 
     model_config = {
@@ -31,7 +31,7 @@ class GradeCreate(BaseModel):
             "examples": [
                 {
                     "student_id": 12,
-                    "score": 96.5,
+                    "score": 96,
                     "parallel_id": 2
                 }
             ]
