@@ -39,7 +39,7 @@ async def register_grade(course_id: int, grade: Annotated[
     Además, se crea un evento a RabbitMQ indicando la creación de la calificación
     """
     grade_id = mongo_service.get_next_sequence_value("grade_id")
-    grade_data = grade.dict()
+    grade_data = grade.model_dump()
     grade_data["grade_id"] = grade_id
     grade_data["course_id"] = course_id
     result = mongo_service.create_grade(grade_data)
@@ -73,7 +73,7 @@ async def list_grades(course_id: int, parallel_id: int, page: int = 1, limit: in
         if isinstance(grade['_id'], ObjectId):
             grade['_id'] = str(grade['_id'])
     if not grades:
-        raise HTTPException(status_code=404, detail="No grades found")
+        raise HTTPException(status_code=404, detail="No se encontraron calificaciones")
     return grades
 
 # NUEVA RUTA: Consultar una calificación por ID
@@ -87,7 +87,7 @@ async def get_grade(grade_id: int):
     grade = mongo_service.get_grade_by_id(grade_id)
     logging.info(f"Calificacion listada por grade_id: {grade_id}")
     if not grade:
-        raise HTTPException(status_code=404, detail="Grade not found")
+        raise HTTPException(status_code=404, detail="No se encontró calificación")
     if isinstance(grade['_id'], ObjectId):
         grade['_id'] = str(grade['_id'])
     return grade
@@ -105,9 +105,9 @@ async def delete_grade(grade_id: int):
     result = mongo_service.delete_grade_by_id(grade_id)
     logging.info(f"Calificacion eliminada por grade_id: {grade_id}")
     if result.deleted_count == 0:
-        raise HTTPException(status_code=404, detail="Grade not found")
+        raise HTTPException(status_code=404, detail="No se encontró calificación")
     emit_events.send(f"grade.{grade_id}.deleted", {"grade_id": grade_id})
-    return {"message": "Grade deleted successfully"}
+    return {"message": "Calificación eliminada exitosamente"}
 
 
 # Servicio para listar las calificaciones de un estudiante
