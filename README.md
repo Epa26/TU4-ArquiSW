@@ -11,6 +11,7 @@
 ## Video TAREA 6
 
 [Video](https://youtu.be/qOaWysEZORQ) demostración de la interfaz y API Gateway.
+
 ---
 
 ### Contexto
@@ -120,6 +121,13 @@ git clone https://github.com/Epa26/TU4-ArquiSW.git
 ```
 
 ### Levantar los contenedores con Docker:
+
+**IMPORTANTE:** verificar si se tiene creada la red de docker `grades`, en caso contrario ejecutar el siguiente comando:
+
+```bash
+docker network create grades
+```
+
 **IMPORTANTE:** se debe ejecutar primero `docker-compose up` desde la carpeta `message-broker` para levantar el servicio RabbitMQ hasta que se inicialice correctamente y luego ejecutar desde la carpeta raiz. 
 
 ```bash
@@ -138,6 +146,32 @@ Una vez que la aplicación esté corriendo, la interfaz estará disponible en `h
 
 ### Acceder a la API Gateway:
 Una vez que la aplicación esté corriendo, la API Gateway estará disponible en `http://localhost:5000`.
+
+### Ejecutar pruebas de servicio:
+
+**IMPORTANTE:** verificar si se tiene creada la red de docker `grades_test`, en caso contrario ejecutar el siguiente comando:
+
+```bash
+docker network create grades_test
+```
+
+Para ejecutar las pruebas de servicio, desde la carpeta `app` ejecutar el siguiente comando:
+
+```bash
+docker-compose -f docker-compose-tests.yml up --abort-on-container-exit --exit-code-from tests
+```
+
+Para revisar el resultado de la ejecución ejecutar el siguiente comando:
+
+```bash
+docker-compose -f docker-compose-tests.yml logs 
+```
+
+Finalmente para cerrar los servicios ejecutar el siguiente comando:
+
+```bash
+docker-compose -f docker-compose-tests.yml down -v
+```
 
 ## Documentación
 
