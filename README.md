@@ -4,13 +4,17 @@
 
 [Video](https://youtu.be/opn19XAtM70) mostrando cada una de las funcionalidades mediante Postman. 
 
-## VIDEO TAREA 5
+## Video TAREA 5
 
 [Video](https://youtu.be/T5IYc8vYJjw) demostración del microservicio en Kubernetes y Pruebas de estres.
 
 ## Video TAREA 6
 
 [Video](https://youtu.be/qOaWysEZORQ) demostración de la interfaz y API Gateway.
+
+## Video TAREA 7
+
+[Video](https://youtu.be/ziaSfOWJkOU) demostración de Pruebas de servicio.
 
 ---
 
