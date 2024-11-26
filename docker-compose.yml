@@ -1,39 +1,48 @@
+name: grade-management
 services:
   frontend:
+    image: fabianlusm/gm-frontend:0.1.0
     build: ./frontend
-    container_name: frontend_react
+    volumes:
+      - .:/gm-volume
     ports:
       - '3000:3000'
   web:
-    build: .
+    image: fabianlusm/gm-web:0.1.1
+    build: ./backend
     ports:
       - "8000:8000"
     volumes:
-      - .:/app
+      - .:/gm-volume
     links:
       - mongo
     environment:
       - DATABASE_URL=mongodb://mongo:27017/grade_management
-
-  app_receiver:
-    build: .
+  app-receiver:
+    image: fabianlusm/gm-receiver:0.1.0
+    build: ./app-receiver
     volumes:
-      - .:/app
+      - .:/gm-volume
     links:
       - mongo
-    command: python3 app/services/rabbitmq.py
-
   mongo:
     image: mongo:latest
+    container_name: gm-database
     volumes:
-      - grades_mongo_container:/data/db
+      - gm-volume:/data/db
     ports:
       - "27017:27017"
     logging:
         driver: none
-
+  api-gateway:
+    image: fabianlusm/gm-gateway:0.1.0
+    build: ./api-gateway
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/gm-volume
 volumes:
-  grades_mongo_container:
+  gm-volume:
 
 networks:
   default:

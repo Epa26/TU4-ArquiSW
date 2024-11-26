@@ -1,9 +1,10 @@
+name: grade-management-message-broker
 services:
   rabbitmq:
       image: rabbitmq:3-management-alpine
       ports:
-        - "5672:5672"
-        - "15672:15672"
+        - "5696:5696"
+        - "15696:15696"
 
 networks:
   default:
