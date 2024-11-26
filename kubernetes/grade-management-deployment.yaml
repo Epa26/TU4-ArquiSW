@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grade-management
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: grade-management
+  template:
+    metadata:
+      labels:
+        app: grade-management
+    spec:
+      containers:
+        - image: fabianlusm/gm-gateway:0.1.0
+          name: gm-api-gateway
+          ports:
+            - containerPort: 5000
+              protocol: TCP
+        - image: fabianlusm/gm-receiver:0.1.1
+          name: gm-app-receiver
+        - image: fabianlusm/gm-frontend:0.1.0
+          name: gm-frontend
+          ports:
+            - containerPort: 3000
+              protocol: TCP
+        - image: mongo:latest
+          name: gm-database
+          ports:
+            - containerPort: 27017
+              protocol: TCP
+        - image: rabbitmq:3-management-alpine
+          name: gm-broker
+          ports:
+            - containerPort: 5696
+              protocol: TCP
+            - containerPort: 15696
+              protocol: TCP
+        - env:
+            - name: DATABASE_URL
+              value: mongodb://mongo:27017/grade_management
+          image: fabianlusm/gm-web:0.1.1
+          name: gm-web
+          ports:
+            - containerPort: 8000
+              protocol: TCP
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: grade-management-srvc
+spec:
+  type: LoadBalancer
+  ports:
+    - name: "27017"
+      port: 27017
+      targetPort: 27017
+    - name: "5696"
+      port: 5696
+      targetPort: 5696
+    - name: "15696"
+      port: 15696
+      targetPort: 15696
+    - name: "8000"
+      port: 8000
+      targetPort: 8000
+    - name: "5000"
+      port: 5000
+      targetPort: 5000
+    - name: "3000"
+      port: 80
+      targetPort: 3000
+  selector:
+    app: grade-management

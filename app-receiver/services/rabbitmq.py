@@ -38,9 +38,13 @@ class Emit:
 class Receive:
     def __init__(self):
         logging.info("Waiting for messages...")
-        self.connection = pika.BlockingConnection(
-            pika.ConnectionParameters(host='rabbitmq')
-        )
+        while True:
+            try:
+                self.connection = pika.BlockingConnection(pika.ConnectionParameters(host='rabbitmq'))
+                break
+            except:
+                print("Esperando a que RabbitMQ esté disponible...")
+                time.sleep(5)
 
         self.channel = self.connection.channel()
         self.channel.exchange_declare(exchange='grade_exchange',

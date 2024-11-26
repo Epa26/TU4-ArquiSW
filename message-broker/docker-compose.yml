@@ -1,4 +1,3 @@
-name: grade-management-message-broker
 services:
   rabbitmq:
       image: rabbitmq:3-management-alpine

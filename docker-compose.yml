@@ -1,5 +1,11 @@
 name: grade-management
 services:
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: gm-broker
+    ports:
+      - "5696:5696"
+      - "15696:15696"
   frontend:
     image: fabianlusm/gm-frontend:0.1.0
     build: ./frontend
@@ -19,7 +25,7 @@ services:
     environment:
       - DATABASE_URL=mongodb://mongo:27017/grade_management
   app-receiver:
-    image: fabianlusm/gm-receiver:0.1.0
+    image: fabianlusm/gm-receiver:0.1.1
     build: ./app-receiver
     volumes:
       - .:/gm-volume
